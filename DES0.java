@@ -1,16 +1,27 @@
-import java.util.ArrayList;
-
+/*
+ * Authors: Dylan Bagwell C3432837, 
+ * Course: 3260 Data Security
+ * Date Created: 02/0502025
+ * Last Modified: 25/05/2025 
+ * 
+ * Description: The first implementation full implementation of the DES algortihm.
+ */
 public class DES0 {
     private String plaintext;
     private String key;
-    public String ciphertext;
+    private String inversePlaintext;
+    private String inverseKey;
+    private String ciphertext;
 
-    public DES0(String plaintext, String key) {
+    // Constructor for DES0 class
+    public DES0(String plaintext, String key, String inversePlaintext, String inverseKey) {
         this.plaintext = plaintext;
         this.key = key;
+        this.inversePlaintext = inversePlaintext;
+        this.inverseKey = inverseKey;
     }
 
-    //Expansion Permutation (E Table)
+    //Expansion Permutation (E Table) used at start and end of each function
     private static final int[] EXPANSION_PERMUTATION = {
         32, 1, 2, 3, 4, 5,
         4, 5, 6, 7, 8, 9,
@@ -23,7 +34,7 @@ public class DES0 {
     };
 
 
-    // Permutation table for the initial permutation(IP)
+    // Permutation table for the initial permutation(IP) start of encryption
     private static final int[] INITIAL_PERMUTATION = {
         58, 50, 42, 34, 26, 18, 10, 2,
         60, 52, 44, 36, 28, 20, 12, 4,
@@ -48,50 +59,65 @@ public class DES0 {
     };
 
     // S-boxes for the DES algorithm [row][column]
-    private static final int[][] S_BOXES = {
-        //s1
+    private static final int[][] S1_BOX = {
+    //s1
         {14,4,13,1,2,15,11,8,3,10,6,12,5,9,0,7},
         {0,15,7,4,14,2,13,1,10,6,12,11,9,5,3,8},
         {4,1,14,8,13,6,2,11,15,12,9,7,3,10,5,0}, 
-        {15,12,8,2,4,9,1,7,5,11,3,14,10,0,6,13},
-        //s2
+        {15,12,8,2,4,9,1,7,5,11,3,14,10,0,6,13}
+    };
+    //s2
+    private static final int[][] S2_BOX = {
         {15,1,8,14,6,11,3,4,9,7,2,13,12,0,5,10},
         {3,13,4,7,15,2,8,14,12,0,1,10,6,9,11,5},
         {0,14,7,11,10,4,13,1,5,8,12,6,9,3,2,15},
-        {13,8,10,1,3,15,4,2,11,6,7,12,0,5,14,9},
-        //s3
+        {13,8,10,1,3,15,4,2,11,6,7,12,0,5,14,9}
+    };
+    //s3
+    private static final int [][] S3_BOX = {
         {10,0,9,14,6,3,15,5,1,13,12,7,11,4,2,8},
         {13,7,0,9,3,4,6,10,2,8,5,14,12,11,15,1},
         {13,6,4,9,8,15,3,0,11,1,2,12,5,10,14,7},
-        {1,10,13,0,6,9,8,7,4,15,14,3,11,5,2,12},
-        //s4
+        {1,10,13,0,6,9,8,7,4,15,14,3,11,5,2,12}
+    };
+    //s4
+    private static final int [][] S4_BOX = {
         {7,13,14,3,0,6,9,10,1,2,8,5,11,12,4,15},
         {13,8,11,5,6,15,0,3,4,7,2,12,1,10,14,9},
         {10,6,9,0,12,11,7,13,15,1,3,14,5,2,8,4},
-        {3,15,0,6,10,1,13,8,9,4,5,11,12,7,2,14},
-        //s5
+        {3,15,0,6,10,1,13,8,9,4,5,11,12,7,2,14}
+    };
+    //s5
+    private static final int [][] S5_BOX = {
         {2,12,4,1,7,10,11,6,8,5,3,15,13,0,14,9},
         {14,11,2,12,4,7,13,1,5,0,15,10,3,9,8,6},
         {4,2,1,11,10,13,7,8,15,9,12,5,6,3,0,14},
-        {11,8,12,7,1,14,2,13,6,15,0,9,10,4,5,3},
+        {11,8,12,7,1,14,2,13,6,15,0,9,10,4,5,3}
+    };
+    //s6
+    private static final int [][] S6_BOX ={
         //s6
         {12,1,10,15,9,2,6,8,0,13,3,4,14,7,5,11},
         {10,15,4,2,7,12,9,5,6,1,13,14,0,11,3,8},
         {9,14,15,5,2,8,12,3,7,0,4,10,1,13,11,6},
-        {4,3,2,12,9,5,15,10,11,14,1,7,6,0,8,13},
-        //s7
+        {4,3,2,12,9,5,15,10,11,14,1,7,6,0,8,13}
+    };
+    //s7
+    private static final int [][] S7_BOX = {
         {4,11,2,14,15,0,8,13,3,12,9,7,5,10,6,1},
         {1,4,11,13,12,3,7,14,10,15,6,8,0,5,9,2},
         {1,4,11,13,12,3,7,14,10,15,6,8,0,5,9,2},
-        {6,11,13,8,1,4,10,7,9,5,0,15,14,2,3,12},
-        //s8
+        {6,11,13,8,1,4,10,7,9,5,0,15,14,2,3,12}
+    };
+    //s8
+    private static final int [][] S8_BOX = {
         {13,2,8,4,6,15,11,1,10,9,3,14,5,0,12,7},
         {1,15,13,8,10,3,7,4,12,5,6,11,0,14,9,2},
         {7,11,4,1,9,12,14,2,0,6,10,13,15,3,5,8},
         {2,1,14,7,4,10,8,13,15,12,9,0,3,5,6,11}
     };
 
-    //Permuation Function(P)
+    //Permuation Function(P) used at start and end of each function
     private static final int[] PERMUTATION = {
         16, 7, 20, 21,
         29, 12, 28, 17,
@@ -103,31 +129,62 @@ public class DES0 {
         22, 11, 4, 25
     };
 
+    // Permutation Choice 1 (PC-1) used to permute the key
+    private static final int[] PC1 = {
+        57, 49, 41, 33, 25, 17, 9,
+        1, 58, 50, 42, 34, 26, 18,
+        10, 2, 59, 51, 53, 35, 27,
+        19, 11, 3, 60, 52, 44, 36,
+        63, 55, 47, 39, 31, 23, 15,
+        7, 62, 54, 46, 38, 30, 22,
+        14, 6, 61, 53, 45, 37, 29,
+        21, 13, 5, 28, 20, 12, 4
+    };
 
-    public String encryptDES(String plaintext,String key) {
+    // The number of bits to shift left for each round
+    private static final int[] LEFT_SHIFTS = {1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2};
+
+    // Permutation Choice 2 (PC-2) used to permute the key for each round
+    private static final int[] PC2 = {
+        14, 17, 11, 24, 1, 5, 3, 28,
+        15, 6, 21, 10, 23, 19, 12, 4,
+        26, 8, 16, 7, 27, 20, 13, 2,
+        41, 52, 31, 37, 47, 55, 30, 40,
+        51, 45, 33, 48, 44, 49, 39, 56,
+        34, 53, 46, 42, 50, 36, 29, 32
+    };
+
+    public String encryptDES(String plaintext,String key, String inversePlaintext, String inverseKey) {
+        int round = 0;
         // Initial Permutation
-        String permutedText = permute(plaintext, INITIAL_PERMUTATION);
+        String permutedText = permutation(plaintext, INITIAL_PERMUTATION);
         System.out.println("After Initial Permutation: " + permutedText);
 
-        // Split the text into left and right halves
-        String left = permutedText.substring(0, 32);
-        String right = permutedText.substring(32);
+        String pc1Key = pc1Key(key, PC1);
+        System.out.println("Key after PC1 permutation: " + pc1Key.length());
 
-        // Generate subkeys
-        //ArrayList<String> subkeys = generateSubkeys(key);
+
+        // Split the perumutated plaintext into left and right halves
+        String left = permutedText.substring(0, 32);
+        String right = permutedText.substring(32, 64);
+
+        System.out.println("plain text after IP Left Half: " + left);
+        System.out.println("plain text after IP right Right Half: " + right);
 
         // 16 rounds of DES
-        //for (int i = 0; i < 16; i++) {
-            // String expandedRight = permute(right, EXPANSION_PERMUTATION);
-            // String xorResult = xor(expandedRight, subkeys.get(i));
-            // String sBoxOutput = sBoxSubstitution(xorResult);
-            // String pBoxOutput = permute(sBoxOutput, PERMUTATION);
-            // String newRight = xor(left, pBoxOutput);
+        for (int i = 0; i < 16; i++) {
+            String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
+            String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2));// XOR of expanded right and PC2 key
+            System.out.println("XOR Result: " + xorResult);
+            String sBoxOutput = sBoxSubstitution(xorResult);
+            //String pBoxOutput = permute(sBoxOutput, PERMUTATION);
+            //String newRight = xor(left, pBoxOutput);
 
-            // // Swap left and right halves
-            // left = right;
-            // right = newRight;
-        //}
+            // Swap left and right halves
+            //left = right;
+            //right = newRight;
+            round++;
+        }
 
         // Combine left and right halves
         //String combinedText = right + left;
@@ -138,12 +195,150 @@ public class DES0 {
         return ciphertext;
     }
 
-
-    private static String permute(String input, int[] permutation) {
+    //is a permutation function that rearranges the input string based on the provided permutation table (P)
+    private static String permutation(String input, int[] permutation) {
          StringBuilder output = new StringBuilder();
         for (int i : permutation) {
           output.append(input.charAt(i - 1));
          }
         return output.toString();
+    }
+
+    // returns a key permuted using the PC1 table
+    private static String pc1Key(String key, int[] pc1) {
+        StringBuilder permutatedKey = new StringBuilder();
+
+        //Apply pc1 permutation to the key
+        for (int i : pc1) {
+            permutatedKey.append(key.charAt(i - 1));
+        }
+        String pc1Key = permutatedKey.toString();
+
+        System.out.println("Key after PC1 permutation: " + pc1Key);
+
+        key  = pc1Key.toString();
+        return key; 
+    }
+
+     // Get the shift length for the round then perform left shift on the key 
+    private static String leftShfit(int round,String key )
+    {
+        String keyshifted = "";
+        int shiftLength; 
+        // make sure to stay in the range of 16 rounds
+        if(round >= 16 || round < 0) {
+            throw new IllegalArgumentException("Round must be between 1 and 16");
+        }
+        else
+        {
+
+            shiftLength = LEFT_SHIFTS[round];
+            keyshifted = key.substring(shiftLength) + key.substring(0, shiftLength);
+            System.out.println("Key length after left shift:" + keyshifted.length());
+        }
+        return keyshifted;
+    }
+
+    //returns a key thats been shifted left and permuted using the PC2 table
+    private static String pc2Key(String pc1Key, int[] pc2)
+    {
+        StringBuilder pc2Key= new StringBuilder();
+
+        // Split the key into two halves then perform left shift
+        String cKey = pc1Key.substring(0, 28);// 28 bits for C testing with 0 round for now
+        System.out.println("C Key: " + cKey.length());
+        String dKey = pc1Key.substring(28, 56);// 28 bits for D
+        System.out.println("D Key: " + dKey.length());
+        cKey = leftShfit(0,cKey);
+        dKey = leftShfit(0,dKey);
+
+        // Combine the halves
+        String combined = cKey + dKey;
+
+        // Permute combined key using pc2 array
+        for (int i : pc2) {
+            pc2Key.append(combined.charAt(i - 1));
+        }
+
+        System.out.println("Key after PC2 permutation: " + pc2Key);
+        System.out.println("Key length after PC2 permutation: " + pc2Key.length());
+        String key  = pc2Key.toString();
+        return key;
+    }
+
+    //takes right half and performs (E) expansion permutation
+    private static String expandRight(String right, int[] expansionPermutation) {
+        StringBuilder expandedRight = new StringBuilder();
+        for (int i : expansionPermutation) {
+            expandedRight.append(right.charAt(i - 1));
+        }
+        return expandedRight.toString();
+    }
+
+    //performs XOR operation and  returns new right half 
+    private static String functionXOR(String right, String pc2Key)
+    {
+        String newRight = "";
+        for(int i = 0; i < right.length(); i++) {
+            
+            if(right.charAt(i) == pc2Key.charAt(i)) {
+                newRight += "0"; // XOR 0 with 0 or 1 with 1
+            } else {
+                newRight += "1"; // XOR 0 with 1 or 1 with 0
+            }
+        }
+        return newRight;
+    }
+
+    //performs S-box substitution and returns the output
+    private String sBoxSubstitution(String xorResult) {
+
+        String sboxOutput = "";
+
+        //check if the XOR result is 48 bits long
+        if(xorResult.length() != 48) {
+            throw new IllegalArgumentException("XOR result must be 48 bits long");
+        }
+        else
+        {
+            for(int i = 0; i < 8; i++) {
+            
+                //take 6 bits at a time to put into S-box rounds until 48 bits are processed
+                
+                    int sBoxValue = 0;
+                    String inputSBox = xorResult.substring(0,6);
+                    System.out.println("Input to S-box: " + inputSBox);
+
+                    String outsideBits = inputSBox.substring(0, 1) + inputSBox.substring(5, 6); //take the first and last bits
+                    
+                    //take the middle 4 bits
+                    String middleBits = inputSBox.substring(1, 5);
+
+                    // Convert outsideBits to row and middleBits to column
+                    int row = Integer.parseInt(outsideBits, 2); // Convert binary to decimal
+                    int column = Integer.parseInt(middleBits, 2); // Convert binary to decimal
+
+                    
+
+                    switch (i) {
+                        case 0: sBoxValue = S1_BOX[row][column]; break;
+                        case 1: sBoxValue = S2_BOX[row][column]; break;
+                        case 2: sBoxValue = S3_BOX[row][column]; break;
+                        case 3: sBoxValue = S4_BOX[row][column]; break;
+                        case 4: sBoxValue = S5_BOX[row][column]; break;
+                        case 5: sBoxValue = S6_BOX[row][column]; break;
+                        case 6: sBoxValue = S7_BOX[row][column]; break;
+                        case 7: sBoxValue = S8_BOX[row][column]; break;
+                    }
+                    System.out.println("S-box value: " + sBoxValue);
+                    //remove the first 6 bits from the XOR result
+                    xorResult = xorResult.substring(6);
+                    System.out.println(xorResult.length());
+                    //String sBoxBits = String.format("%4s", Integer.toBinaryString(sBoxValue)).replace(' ', '0');
+                    sboxOutput += sBoxValue;
+                
+            }
+        }
+        return sboxOutput;
     }
 }

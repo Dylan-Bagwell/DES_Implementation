@@ -10,4 +10,6 @@ what the output is and explore the Avalanche effect of the orginal DES. Each ver
 Runing the Program:
 Coded in java must have java 17.0.12 or newer to compile and run.
 
-In the command line in putting java Main.java (file.txt). The name of your file at the end of the command will run the program and output based on the DES used with results pritned to the command line.
+Step 1: Compile the program to run using javac * .java this will complie all files and ensure program runs as intended.
+
+Step 2: In the command line in putting java Main.java (file.txt). The name of your file at the end of the command will run the program and output based on the DES used with results pritned to the command line.

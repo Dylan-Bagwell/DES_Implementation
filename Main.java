@@ -14,6 +14,8 @@ import java.util.Scanner;
 public class Main {
     private String plaintext = "";
     private String key = "";
+    private String inversePlaintext = "";
+    private String inverseKey = "";
     public static void main(String[] args) {
 
     // Reads 64-bit block and key from input.txt
@@ -36,19 +38,18 @@ public class Main {
             if (file.exists()) {
                 try (console) {
                     while (console.hasNext()) {
+
                         // Read the plaintext, inverse plaintext, key, and inverse key from the file based off Assignment spec
-                        String hexKey = console.nextLine();
-                        String plaintext = console.nextLine();
-                        String inversePlaintext = console.nextLine();
-                        String key = console.nextLine();
-                        String inverseKey = console.nextLine();
+                        String plaintext = console.nextLine(); //P
+                        String inversePlaintext = console.nextLine(); //P'
+                        String key = console.nextLine();//K
+                        String inverseKey = console.nextLine();//K'
 
                         //Full DES algorithm
-                        DES0 des = new DES0(plaintext,key);
-                        des.encryptDES(plaintext, key);
+                        DES0 des = new DES0(plaintext,inversePlaintext,key,inverseKey);
+                        des.encryptDES(plaintext, inversePlaintext, key, inverseKey);
 
                         //If the file has hex and is not binary, convert it to binary
-                        // System.out.println(convertHexToBinar(hexKey));
                         // System.out.println("Plaintext: " + plaintext);
                         // System.out.println("Inverse Plaintext: " + inversePlaintext);
                         // System.out.println("Key: " + key);
@@ -60,21 +61,9 @@ public class Main {
         }
 
         //Full DES algorithm
-        DES0 des = new DES0(plaintext,key);
-        des.encryptDES(plaintext, key);
+        //DES0 des = new DES0(plaintext,key,inversePlaintext,inverseKey);
+        //des.encryptDES(plaintext, key, inversePlaintext, inverseKey);
     }
 
-    //convert hex to binary
-    public static String convertHexToBinar(String hex)
-    {
-        StringBuilder binary = new StringBuilder();
-        for(int i = 0; i < hex.length(); i++)
-        {
-            binary.append(Integer.toBinaryString(hex.charAt(i)));
-            
-        }
-        System.out.println(hex.length());
-        System.out.println(binary.length());
-        return binary.toString();
-    }
+
 }
