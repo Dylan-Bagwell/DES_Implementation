@@ -48,22 +48,12 @@ public class Main {
                         //Full DES algorithm
                         DES0 des = new DES0(plaintext,inversePlaintext,key,inverseKey);
                         des.encryptDES(plaintext, inversePlaintext, key, inverseKey);
+                    
 
-                        //If the file has hex and is not binary, convert it to binary
-                        // System.out.println("Plaintext: " + plaintext);
-                        // System.out.println("Inverse Plaintext: " + inversePlaintext);
-                        // System.out.println("Key: " + key);
-                        // System.out.println("Inverse Key: " + inverseKey);
                     }
                 }
 
             }
         }
-
-        //Full DES algorithm
-        //DES0 des = new DES0(plaintext,key,inversePlaintext,inverseKey);
-        //des.encryptDES(plaintext, key, inversePlaintext, inverseKey);
     }
-
-
 }

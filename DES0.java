@@ -21,6 +21,9 @@ public class DES0 {
         this.inverseKey = inverseKey;
     }
 
+    public String getCipherText() {
+        return ciphertext;
+    }
     //Expansion Permutation (E Table) used at start and end of each function
     private static final int[] EXPANSION_PERMUTATION = {
         32, 1, 2, 3, 4, 5,
@@ -155,7 +158,7 @@ public class DES0 {
     };
 
     public String encryptDES(String plaintext,String key, String inversePlaintext, String inverseKey) {
-        int round = 0;
+        
         // Initial Permutation
         String permutedText = permutation(plaintext, INITIAL_PERMUTATION);
         System.out.println("After Initial Permutation: " + permutedText);
@@ -177,22 +180,23 @@ public class DES0 {
             String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2));// XOR of expanded right and PC2 key
             System.out.println("XOR Result: " + xorResult);
             String sBoxOutput = sBoxSubstitution(xorResult);
-            //String pBoxOutput = permute(sBoxOutput, PERMUTATION);
-            //String newRight = xor(left, pBoxOutput);
+            String pBoxOutput = endPermutaion(sBoxOutput, PERMUTATION);
+            String newRight = functionXOR(left, pBoxOutput);
+            System.out.println("New Right Half: " + newRight + " Length: " + newRight.length());
 
-            // Swap left and right halves
-            //left = right;
-            //right = newRight;
-            round++;
+            // Update left and right halves for the next round
+            left = right; // left becomes the old right
+            right = newRight; // right becomes the new right
+            
         }
 
         // Combine left and right halves
-        //String combinedText = right + left;
+        String combinedHalves = right + left;
 
-        // Final Permutation
-        //String ciphertext = permute(combinedText, FINAL_PERMUTATION);
-        //System.out.println("Ciphertext: " + ciphertext);
-        return ciphertext;
+        // Final permutation (IP-1 Inverse)
+        this.ciphertext = permutation(combinedHalves, FINAL_PERMUTATION);
+        System.out.println("Ciphertext: " + ciphertext + " Length: " + ciphertext.length());
+        return this.ciphertext;
     }
 
     //is a permutation function that rearranges the input string based on the provided permutation table (P)
@@ -275,13 +279,13 @@ public class DES0 {
         return expandedRight.toString();
     }
 
-    //performs XOR operation and  returns new right half 
-    private static String functionXOR(String right, String pc2Key)
+    //performs XOR operation   
+    private static String functionXOR(String side1, String side2)
     {
         String newRight = "";
-        for(int i = 0; i < right.length(); i++) {
+        for(int i = 0; i < side1.length(); i++) {
             
-            if(right.charAt(i) == pc2Key.charAt(i)) {
+            if(side1.charAt(i) == side2.charAt(i)) {
                 newRight += "0"; // XOR 0 with 0 or 1 with 1
             } else {
                 newRight += "1"; // XOR 0 with 1 or 1 with 0
@@ -334,11 +338,24 @@ public class DES0 {
                     //remove the first 6 bits from the XOR result
                     xorResult = xorResult.substring(6);
                     System.out.println(xorResult.length());
-                    //String sBoxBits = String.format("%4s", Integer.toBinaryString(sBoxValue)).replace(' ', '0');
-                    sboxOutput += sBoxValue;
-                
+
+                    //Convert back to binary
+                    sboxOutput += String.format("%4s", Integer.toBinaryString(sBoxValue)).replace(' ', '0');
+                    
+                    
             }
         }
         return sboxOutput;
     }
+
+    // Performs the perumation (P) on the S-box output
+    private String endPermutaion(String sBox,int [] permutationP) {
+
+        for (int i : permutationP) {
+            sBox += sBox.charAt(i - 1);
+        }
+        System.out.println("S-box output after P permutation: " + sBox + " Length: " + sBox.length());//should be 32 bits long
+        return sBox;
+    }
+
 }
