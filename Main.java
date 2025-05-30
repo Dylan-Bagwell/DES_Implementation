@@ -21,7 +21,8 @@ public class Main {
     private double runTime = 0; // will be used to track runtime of Avalanche effect
     private String printTable1 = "";
     private String printTable2 = "";
-
+    private String encryptionfile = "EncryptionOutput.txt";
+    private String decryptFileName = "DecryptionOutput.txt";
     public static void main(String[] args) {
 
         /*
@@ -74,32 +75,35 @@ public class Main {
         runTime = (int) (end - start)/1000; // Calculate the total running time in seconds
         // creates output file
         createOutputFile();
-
+        createDecryptOutputFile();
         // write to output file
-        writeToFile("Avalanche Demonstration\n");
-        writeToFile("Plaintext P: " + plaintext + "\n");
-        writeToFile("Plaintext P': " + inversePlaintext + "\n");
-        writeToFile("Key K: " + key + "\n");
-        writeToFile("Key K: " + inverseKey + "\n");
-        writeToFile("Total running: " + runTime + "(seconds)\n\n");
-        writeToFile("P and P' under K\n");
-        writeToFile("Ciphertext C: " + des0.getCipherTextP() + "\n");
-        writeToFile("Ciphertext C': " + des0.getInvCipherText() + "\n");
-        writeToFile("Round    " + des0.getName() +"    " +des1.getName()+"\n");// will add in all the names of the DES1.. etc
+        writeToFile("Avalanche Demonstration\n", encryptionfile);
+        writeToFile("Plaintext P: " + plaintext + "\n", encryptionfile);
+        writeToFile("Plaintext P': " + inversePlaintext + "\n", encryptionfile);
+        writeToFile("Key K: " + key + "\n", encryptionfile);
+        writeToFile("Key K: " + inverseKey + "\n", encryptionfile);
+        writeToFile("Total running: " + runTime + "(seconds)\n\n", encryptionfile);
+        writeToFile("P and P' under K\n", encryptionfile);
+        writeToFile("Ciphertext C: " + des0.getCipherTextP() + "\n", encryptionfile);
+        writeToFile("Ciphertext C': " + des0.getInvCipherText() + "\n", encryptionfile);
+        writeToFile("Round    " + des0.getName() +"    " +des1.getName()+"\n",encryptionfile);// will add in all the names of the DES1.. etc
         for (int j = 0; j < 17; j++) {
            printTable1 += String.format("%5d    %3d    %3d\n", j, des0.getCompareRound1(j), des1.getCompareRound1(j));
         }
-        writeToFile(printTable1);
-        writeToFile("\nP under K and K'\n");
-        writeToFile("Ciphertext C: " + des0.getCipherTextP() + "\n");
-        writeToFile("Ciphertext C':" + des0.getCipherPInvK() + "\n");
-         writeToFile("Round    " + des0.getName() +"    " +des1.getName()+"\n");// will add in all the names of the DES1.. etc
+        writeToFile(printTable1, encryptionfile);
+        writeToFile("\nP under K and K'\n", encryptionfile);
+        writeToFile("Ciphertext C: " + des0.getCipherTextP() + "\n", encryptionfile);
+        writeToFile("Ciphertext C':" + des0.getCipherPInvK() + "\n", encryptionfile);
+         writeToFile("Round    " + des0.getName() +"    " +des1.getName()+"\n",encryptionfile);// will add in all the names of the DES1.. etc
         for (int j = 0; j < 17; j++) {
             printTable2 += String.format("%5d    %3d    %3d\n", j, des0.getCompareRound2(j), des1.getCompareRound2(j));
         }
-        writeToFile(printTable2);
+        writeToFile(printTable2, encryptionfile);
         
-        
+        //Decryption File
+        writeToFile("DECRYPTION\n", decryptFileName);
+        writeToFile("Ciphertext C: \n", decryptFileName);
+        writeToFile("Key K: \n",decryptFileName);
     }
 
     /**
@@ -110,10 +114,10 @@ public class Main {
      * @param output The output string to be written to the file.
      * @throws IOException
      */
-    public void writeToFile(String output) {
+    public void writeToFile(String output,String fileName) {
         try {
             // Create a FileWriter object to write to the file in append mode
-            FileWriter write = new FileWriter("EncryptionOutput.txt", true);
+            FileWriter write = new FileWriter(fileName, true);
 
             // Write the output string to the file
             write.write(output);
@@ -134,6 +138,20 @@ public class Main {
             }
         } catch (Exception e) {
             System.out.println("EncryptionOutput file was not created: " + e.getMessage());
+        }
+    }
+
+    public void createDecryptOutputFile() {
+        // create the output file if it doesnt exist
+        try {
+            File outputFile = new File("DecryptionOutput.txt");
+            if (outputFile.createNewFile()) {
+                System.out.println("DecryptionOutput file created: " + outputFile.getName());
+            } else {
+                System.out.println("DecryptionOutput file already exists.");
+            }
+        } catch (Exception e) {
+            System.out.println("DecryptionOutput file was not created: " + e.getMessage());
         }
     }
 }
