@@ -1,7 +1,7 @@
 # 3260A2
 Code for the DES for Assignment 2
 
-Authors: Dylan Bagwell C3432837
+Authors: Dylan Bagwell C3432837, Daniel Ferguson C3373690
 
 Dated Created: 02/05/2025
 Description: Program takes an input file and Runs different versions of DES to see

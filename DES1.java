@@ -1,24 +1,26 @@
 /*
  * Authors: Dylan Bagwell C3432837, Daniel Ferguson C3373690
  * Course: 3260 Data Security
- * Date Created: 02/0502025
+ * Date Created: 30/0502025
  * Last Modified: 30/05/2025 
  * 
- * Description: The first implementation full implementation of the DES algortihm.
+ * Description: The Second implementation full implementation of the DES algortihm.
  */
-public class DES0 {
-    private String name = "DES0"; // Name of the DES implementation
-    private String plaintext;
-    private String key;
-    private String inversePlaintext;
-    private String inverseKey;
+public class DES1 {
+
+    private String name = "DES1"; // Name of the DES implementation
+    private String plaintext = "";
+    private String key = "";
+    private String inversePlaintext = "";
+    private String inverseKey = "";
     private String ciphertext;
     private String inverseCiphertext;
     private String pUnderKInv;
     private int[] compareRound1; // Array to store comparison results for each round
     private int[] compareRound2; // Array to store comparison results for each round
+
     // Constructor for DES0 class
-    public DES0(String plaintext, String key, String inversePlaintext, String inverseKey) {
+    public DES1(String plaintext, String key, String inversePlaintext, String inverseKey) {
         this.plaintext = plaintext;
         this.key = key;
         this.inversePlaintext = inversePlaintext;
@@ -193,9 +195,13 @@ public class DES0 {
      */
     public void encryptDES(String plaintext, String inversePlaintext, String key,String inverseKey) {
 
+        
         int round = 0;
+
         // round zero comparison 
         compareRound1[0] = compareRound(plaintext, inversePlaintext, round);
+        
+        
         
         // Initial Permutation
         String permPlain = permutation(plaintext, INITIAL_PERMUTATION);
@@ -203,8 +209,8 @@ public class DES0 {
         String plainKeyInv = permutation(plaintext, INITIAL_PERMUTATION);
         
 
-        String pc1Key = pc1Key(key, PC1);
-        String pc1KeyInv = pc1Key(inverseKey, PC1);
+        //String pc1Key = pc1Key(key, PC1);
+        //String pc1KeyInv = pc1Key(inverseKey, PC1);
         // Split the perumutated plaintext into left and right halves
         String left = permPlain.substring(0, 32);
         String right = permPlain.substring(32, 64);
@@ -220,13 +226,13 @@ public class DES0 {
         for (int i = 0; i < 16; i++) {
 
             String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2));// XOR of expanded right and PC2 key
-            String sBoxOutput = sBoxSubstitution(xorResult);
+            //String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2));// XOR of expanded right and PC2 key
+            String sBoxOutput = sBoxSubstitution(expandedRight);
             String pBoxOutput = endPermutaion(sBoxOutput, PERMUTATION);
             String newRight = functionXOR(left, pBoxOutput);
            
 
-            String tempComp1 = left + right; //  P under K
+            String tempComp1 = left + right; // combine left and right halves for comparison P and K
 
             // Update left and right halves for the next round
             left = right; // left becomes the old right
@@ -234,30 +240,30 @@ public class DES0 {
 
             // Second round for comparison
             String expandedRightInv = expandRight(rightInv, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResultInv = functionXOR(expandedRightInv, pc2Key(pc1Key, PC2));// XOR of expanded right and PC2
-            String sBoxOutputInv = sBoxSubstitution(xorResultInv);
+            //String xorResultInv = functionXOR(expandedRightInv, pc2Key(pc1Key, PC2));// XOR of expanded right and PC2
+            String sBoxOutputInv = sBoxSubstitution(expandedRightInv);
             String pBoxOutputInv = endPermutaion(sBoxOutputInv, PERMUTATION);
             String newRightInv = functionXOR(leftInv, pBoxOutputInv);
 
             
 
-            String tempComp2 = leftInv + rightInv; // P' and K
+            String tempComp2 = leftInv + rightInv; // combine left and right halves for comparison P' and K
 
             // Update left and right halves for the next round
             leftInv = rightInv; // left becomes the old right
             rightInv = newRightInv; // right becomes the new right
            
 
-            // P under K'
+            // plaintext with inverse key comparison
             String expandedRightIvKy = expandRight(rightPlainInv, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResultIvKy = functionXOR(expandedRightIvKy, pc2Key(pc1KeyInv, PC2));// XOR of expanded right and PC2
-            String sBoxOutputIvKy = sBoxSubstitution(xorResultIvKy);
+            //String xorResultIvKy = functionXOR(expandedRightIvKy, pc2Key(pc1KeyInv, PC2));// XOR of expanded right and PC2
+            String sBoxOutputIvKy = sBoxSubstitution(expandedRightIvKy);
             String pBoxOutputIvKy = endPermutaion(sBoxOutputIvKy, PERMUTATION);
             String newRightIvKy = functionXOR(leftPlainInv, pBoxOutputIvKy);
 
             
 
-            String tempComp3 = leftPlainInv+ rightPlainInv; // P under K'
+            String tempComp3 = leftPlainInv+ rightPlainInv; // plaintext with inverse key comparison
             
             // Update left and right halves for the next round
             leftPlainInv = rightPlainInv; // left becomes the old right
@@ -461,7 +467,7 @@ public class DES0 {
                 count++;
             }
         }
-        //System.out.println("Number of differing bits in " + round + ": " + count);
+        
         return count; // Return the number of differing bits
     }
 }
