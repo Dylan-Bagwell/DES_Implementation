@@ -6,7 +6,7 @@
             "name": "Run Main with input.txt",
             "request": "launch",
             "mainClass": "Main",
-            "args": "input.txt"
+            "args": ["EncryptInput.txt","DecryptionInput.txt"]
         }
     ]
 }

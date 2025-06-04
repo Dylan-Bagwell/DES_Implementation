@@ -18,6 +18,8 @@ public class Main {
     private String key = "";
     private String inversePlaintext = "";
     private String inverseKey = "";
+    private String DecryptText = "";
+    private String DecryptKey = "";
     private double runTime = 0; // will be used to track runtime of Avalanche effect
     private String printTable1 = "";
     private String printTable2 = "";
@@ -45,7 +47,7 @@ public class Main {
             Scanner console = new Scanner(file);
             if (file.exists()) {
                 try (console) {
-                    while (console.hasNext()) {
+                    while (console.hasNext() && file.getName().equals("EncryptInput.txt")) {
 
                         // Read the plaintext, inverse plaintext, key, and inverse key from the file
                         // based off Assignment spec
@@ -53,6 +55,13 @@ public class Main {
                         this.inversePlaintext = console.nextLine(); // P'
                         this.key = console.nextLine();// K
                         this.inverseKey = console.nextLine();// K'
+
+                    }
+                    while (console.hasNext() && file.getName().equals("DecryptionInput.txt")) {
+
+                        // Read the ciphertext and key for decryption
+                        this.DecryptText = console.nextLine(); // C
+                        this.DecryptKey = console.nextLine(); // K
 
                     }
                 }
@@ -81,7 +90,7 @@ public class Main {
         writeToFile("Plaintext P: " + plaintext + "\n", encryptionfile);
         writeToFile("Plaintext P': " + inversePlaintext + "\n", encryptionfile);
         writeToFile("Key K: " + key + "\n", encryptionfile);
-        writeToFile("Key K: " + inverseKey + "\n", encryptionfile);
+        writeToFile("Key K': " + inverseKey + "\n", encryptionfile);
         writeToFile("Total running: " + runTime + "(seconds)\n\n", encryptionfile);
         writeToFile("P and P' under K\n", encryptionfile);
         writeToFile("Ciphertext C: " + des0.getCipherTextP() + "\n", encryptionfile);
@@ -102,8 +111,9 @@ public class Main {
         
         //Decryption File
         writeToFile("DECRYPTION\n", decryptFileName);
-        writeToFile("Ciphertext C: \n", decryptFileName);
-        writeToFile("Key K: \n",decryptFileName);
+        writeToFile("Ciphertext C: " + DecryptText+"\n", decryptFileName);
+        writeToFile("Key K: " + DecryptKey+"\n",decryptFileName);
+        writeToFile("Plaintext P: " + des0.decryptDES(DecryptText, DecryptKey)+"\n", decryptFileName);
     }
 
     /**

@@ -193,9 +193,9 @@ public class DES0 {
      */
     public void encryptDES(String plaintext, String inversePlaintext, String key,String inverseKey) {
 
-        int round = 0;
+       
         // round zero comparison 
-        compareRound1[0] = compareRound(plaintext, inversePlaintext, round);
+        compareRound1[0] = compareRound(plaintext, inversePlaintext);
         
         // Initial Permutation
         String permPlain = permutation(plaintext, INITIAL_PERMUTATION);
@@ -220,7 +220,7 @@ public class DES0 {
         for (int i = 0; i < 16; i++) {
 
             String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2));// XOR of expanded right and PC2 key
+            String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2,i));// XOR of expanded right and PC2 key
             String sBoxOutput = sBoxSubstitution(xorResult);
             String pBoxOutput = endPermutaion(sBoxOutput, PERMUTATION);
             String newRight = functionXOR(left, pBoxOutput);
@@ -234,7 +234,7 @@ public class DES0 {
 
             // Second round for comparison
             String expandedRightInv = expandRight(rightInv, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResultInv = functionXOR(expandedRightInv, pc2Key(pc1Key, PC2));// XOR of expanded right and PC2
+            String xorResultInv = functionXOR(expandedRightInv, pc2Key(pc1Key, PC2,i));// XOR of expanded right and PC2
             String sBoxOutputInv = sBoxSubstitution(xorResultInv);
             String pBoxOutputInv = endPermutaion(sBoxOutputInv, PERMUTATION);
             String newRightInv = functionXOR(leftInv, pBoxOutputInv);
@@ -250,7 +250,7 @@ public class DES0 {
 
             // P under K'
             String expandedRightIvKy = expandRight(rightPlainInv, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResultIvKy = functionXOR(expandedRightIvKy, pc2Key(pc1KeyInv, PC2));// XOR of expanded right and PC2
+            String xorResultIvKy = functionXOR(expandedRightIvKy, pc2Key(pc1KeyInv, PC2,i));// XOR of expanded right and PC2
             String sBoxOutputIvKy = sBoxSubstitution(xorResultIvKy);
             String pBoxOutputIvKy = endPermutaion(sBoxOutputIvKy, PERMUTATION);
             String newRightIvKy = functionXOR(leftPlainInv, pBoxOutputIvKy);
@@ -264,9 +264,9 @@ public class DES0 {
             rightPlainInv = newRightIvKy; // right becomes the new right
 
             //Comparisions to be stored and printed out later
-            compareRound1[i + 1] = compareRound(tempComp1, tempComp2, round);//P and P' under K
-            compareRound2[i + 1] = compareRound(tempComp1, tempComp3, round);//P under K and K'
-            round++;
+            compareRound1[i + 1] = compareRound(tempComp1, tempComp2);//P and P' under K
+            compareRound2[i + 1] = compareRound(tempComp1, tempComp3);//P under K and K'
+            
         }
 
         // Combine left and right halves
@@ -323,7 +323,7 @@ public class DES0 {
     }
 
     // returns a key thats been shifted left and permuted using the PC2 table
-    private static String pc2Key(String pc1Key, int[] pc2) {
+    private static String pc2Key(String pc1Key, int[] pc2, int round) {
         StringBuilder pc2Key = new StringBuilder();
 
         // Split the key into two halves then perform left shift
@@ -331,8 +331,8 @@ public class DES0 {
         // System.out.println("C Key: " + cKey.length());
         String dKey = pc1Key.substring(28, 56);// 28 bits for D
         // System.out.println("D Key: " + dKey.length());
-        cKey = leftShfit(0, cKey);
-        dKey = leftShfit(0, dKey);
+        cKey = leftShfit(round, cKey);
+        dKey = leftShfit(round, dKey);
 
         // Combine the halves
         String combined = cKey + dKey;
@@ -371,7 +371,8 @@ public class DES0 {
         return newRight;
     }
 
-    // performs S-box substitution and returns the output
+    
+    // Performs S-box substitution on the XOR result
     private String sBoxSubstitution(String xorResult) {
 
         String sboxOutput = "";
@@ -388,8 +389,7 @@ public class DES0 {
                 String inputSBox = xorResult.substring(0, 6);
                 // System.out.println("Input to S-box: " + inputSBox);
 
-                String outsideBits = inputSBox.substring(0, 1) + inputSBox.substring(5, 6); // take the first and last
-                                                                                            // bits
+                String outsideBits = inputSBox.substring(0, 1) + inputSBox.substring(5, 6); // take the first and last bits
 
                 // take the middle 4 bits
                 String middleBits = inputSBox.substring(1, 5);
@@ -448,7 +448,15 @@ public class DES0 {
         return sBox;
     }
 
-    private int compareRound(String one, String two, int round) {
+    /**
+     * Compares two strings bit by bit and counts the number of differing bits.
+     * 
+     * @param one  The first string to compare.
+     * @param two  The second string to compare.
+     *
+     * @return The number of differing bits between the two strings.
+     */
+    private int compareRound(String one, String two) {
         int count = 0;
         // Check if the two strings are of equal length
         if (one.length() != two.length()) {
@@ -463,5 +471,45 @@ public class DES0 {
         }
         //System.out.println("Number of differing bits in " + round + ": " + count);
         return count; // Return the number of differing bits
+    }
+
+    /**
+     * Decrypts the ciphertext using the DES algorithm.
+     * 
+     * @param decryptText The ciphertext to be decrypted.
+     * @param decryptKey  The key to be used for decryption.
+     * @return The decrypted plaintext.
+     */
+    public String decryptDES(String decryptText, String decryptKey) {
+        
+        String decrypted = "";
+
+        String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
+        String pc1Key = pc1Key(decryptKey, PC1);
+
+        // Split the perumutated plaintext into left and right halves
+        String left = decrpt.substring(0, 32);
+        String right = decrpt.substring(32, 64);
+
+        for (int i = 15; i >= 0; i--) {
+
+            String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
+            String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2,i));// XOR of expanded right and PC2 key
+            String sBoxOutput = sBoxSubstitution(xorResult);
+            String pBoxOutput = endPermutaion(sBoxOutput, PERMUTATION);
+            String newRight = functionXOR(left, pBoxOutput);
+
+            // Update left and right halves for the next round
+            left = right; // left becomes the old right
+            right = newRight; // right becomes the new right
+
+        }
+
+        // Combine left and right halves
+        String combinedHalves = right + left;
+
+        // Final permutation (IP-1 Inverse)
+        decrypted = permutation(combinedHalves, FINAL_PERMUTATION);
+        return decrypted;
     }
 }
