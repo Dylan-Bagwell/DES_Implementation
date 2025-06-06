@@ -2,9 +2,9 @@
  * Authors: Dylan Bagwell C3432837, Daniel Ferguson C3373690
  * Course: 3260 Data Security
  * Date Created: 02/0502025
- * Last Modified: 30/05/2025 
+ * Last Modified: 06/06/2025
  * 
- * Description: The first implementation full implementation of the DES algortihm.
+ * Description: The first implementation of the DES algortihm.
  */
 public class DES0 implements DESInterface {
     private String name = "DES0"; // Name of the DES implementation

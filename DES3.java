@@ -4,7 +4,8 @@
  * Date Created: 30/0502025
  * Last Modified: 30/05/2025 
  * 
- * Description: The Second implementation full implementation of the DES algortihm.
+ * Description: The Fourth implementation of the DES algorithm.
+ * This implementation omits the Permutation P compared to the base DES0 class
  */
 public class DES3 implements DESInterface {
 
@@ -488,7 +489,7 @@ public class DES3 implements DESInterface {
                 count++;
             }
         }
-        
+
         return count; // Return the number of differing bits
     }
 

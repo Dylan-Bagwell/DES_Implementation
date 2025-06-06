@@ -4,8 +4,7 @@
  * Date Created: 02/05/2025
  * Last Modified: 06/06/2025
  *
- * Description: The DESInterface defines the methods that any class
- * implementing DES encryption and decryption must provide.
+ * Description: The DESInterface defines the methods that must be implemented by any DES variant.
  * This has been created to allow easy iteration inside the main class
  */
 
