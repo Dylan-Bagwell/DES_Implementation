@@ -6,7 +6,7 @@
  * 
  * Description: The Second implementation full implementation of the DES algortihm.
  */
-public class DES1 {
+public class DES1 implements DESInterface {
 
     private String name = "DES1"; // Name of the DES implementation
     private String plaintext = "";
