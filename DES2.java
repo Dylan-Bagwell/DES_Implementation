@@ -52,17 +52,16 @@ public class DES2 {
         return compareRound2[round];
     }
 
-    // Proper Inverse Expansion Permutation (E^-1) - contracts 48 bits back to 32 bits
-    // Maps each 48-bit position back to its corresponding 32-bit position
+    // E^-1 Table, specific to the DES2 class
     private static final int[] INVERSE_EXPANSION_TABLE = {
         2, 3, 4, 5, 6, 9, 10, 11, 12, 15, 16, 17, 18, 21, 22, 23, 
         24, 27, 28, 29, 30, 33, 34, 35, 36, 39, 40, 41, 42, 45, 46, 1
     };
     
-    // Apply inverse expansion using the proper mapping
+    // inverse expansion using the proper mapping, specific to the DES2 class
     private static String inverseExpansion(String input48) {
         if (input48.length() != 48) {
-            throw new IllegalArgumentException("Input must be 48 bits long");
+            throw new IllegalArgumentException("must be 48 bits long");
         }
         StringBuilder output32 = new StringBuilder();
         for (int pos : INVERSE_EXPANSION_TABLE) {
