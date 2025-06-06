@@ -491,4 +491,41 @@ public class DES3 {
         
         return count; // Return the number of differing bits
     }
+
+    /**
+     * Decrypts the ciphertext using DES3 algorithm (no P-box permutation).
+     * 
+     * @param decryptText The ciphertext to be decrypted.
+     * @param decryptKey The key to be used for decryption.
+     * @return The decrypted plaintext.
+     */
+    public String decryptDES(String decryptText, String decryptKey) {
+        String decrypted = "";
+
+        String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
+        String pc1Key = pc1Key(decryptKey, PC1);
+
+        // Split the permutated ciphertext into left and right halves
+        String left = decrpt.substring(0, 32);
+        String right = decrpt.substring(32, 64);
+
+        // 16 rounds of DES decryption (reverse order)
+        for (int i = 15; i >= 0; i--) {
+            String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
+            String xorResult = functionXOR(expandedRight, pc2KeyRound(pc1Key, PC2, i));// XOR of expanded right and PC2 key
+            // DES3: Keep S-boxes but skip P-box permutation
+            String sBoxOutput = sBoxSubstitution(xorResult);
+            String newRight = functionXOR(left, sBoxOutput);
+
+            // Update left and right halves for the next round
+            left = right; // left becomes the old right
+            right = newRight; // right becomes the new right
+        }
+
+        // Combine left and right halves
+        String combinedHalves = right + left;
+        // Final permutation (IP-1 Inverse)
+        decrypted = permutation(combinedHalves, FINAL_PERMUTATION);
+        return decrypted;
+    }
 }

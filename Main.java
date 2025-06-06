@@ -75,8 +75,12 @@ public class Main {
 
         DES0 des0 = new DES0(plaintext, inversePlaintext, key, inverseKey);
         DES1 des1 = new DES1(plaintext, inversePlaintext,key, inverseKey);
+        DES2 des2 = new DES2(plaintext, inversePlaintext,key, inverseKey);
+        DES3 des3 = new DES3(plaintext, inversePlaintext,key, inverseKey);
         des0.encryptDES(plaintext, inversePlaintext, key,inverseKey);
         des1.encryptDES(plaintext,inversePlaintext, key, inverseKey);
+        des2.encryptDES(plaintext,inversePlaintext, key, inverseKey);
+        des3.encryptDES(plaintext,inversePlaintext, key, inverseKey);
         
         
         Long end = System.currentTimeMillis();
@@ -95,17 +99,17 @@ public class Main {
         writeToFile("P and P' under K\n", encryptionfile);
         writeToFile("Ciphertext C: " + des0.getCipherTextP() + "\n", encryptionfile);
         writeToFile("Ciphertext C': " + des0.getInvCipherText() + "\n", encryptionfile);
-        writeToFile("Round    " + des0.getName() +"    " +des1.getName()+"\n",encryptionfile);// will add in all the names of the DES1.. etc
+        writeToFile("Round    " + des0.getName() +"    " +des1.getName()+"    " +des2.getName()+"    " +des3.getName()+"\n",encryptionfile);
         for (int j = 0; j < 17; j++) {
-           printTable1 += String.format("%5d    %3d    %3d\n", j, des0.getCompareRound1(j), des1.getCompareRound1(j));
+           printTable1 += String.format("%5d    %3d    %3d    %3d    %3d\n", j, des0.getCompareRound1(j), des1.getCompareRound1(j), des2.getCompareRound1(j), des3.getCompareRound1(j));
         }
         writeToFile(printTable1, encryptionfile);
         writeToFile("\nP under K and K'\n", encryptionfile);
         writeToFile("Ciphertext C: " + des0.getCipherTextP() + "\n", encryptionfile);
         writeToFile("Ciphertext C':" + des0.getCipherPInvK() + "\n", encryptionfile);
-         writeToFile("Round    " + des0.getName() +"    " +des1.getName()+"\n",encryptionfile);// will add in all the names of the DES1.. etc
+         writeToFile("Round    " + des0.getName() +"    " +des1.getName()+"    " +des2.getName()+"    " +des3.getName()+"\n",encryptionfile);
         for (int j = 0; j < 17; j++) {
-            printTable2 += String.format("%5d    %3d    %3d\n", j, des0.getCompareRound2(j), des1.getCompareRound2(j));
+            printTable2 += String.format("%5d    %3d    %3d    %3d    %3d\n", j, des0.getCompareRound2(j), des1.getCompareRound2(j), des2.getCompareRound2(j), des3.getCompareRound2(j));
         }
         writeToFile(printTable2, encryptionfile);
         
@@ -113,7 +117,10 @@ public class Main {
         writeToFile("DECRYPTION\n", decryptFileName);
         writeToFile("Ciphertext C: " + DecryptText+"\n", decryptFileName);
         writeToFile("Key K: " + DecryptKey+"\n",decryptFileName);
-        writeToFile("Plaintext P: " + des0.decryptDES(DecryptText, DecryptKey)+"\n", decryptFileName);
+        writeToFile("DES0 Plaintext: " + des0.decryptDES(DecryptText, DecryptKey)+"\n", decryptFileName);
+        writeToFile("DES1 Plaintext: " + des1.decryptDES(DecryptText, DecryptKey)+"\n", decryptFileName);
+        writeToFile("DES2 Plaintext: " + des2.decryptDES(DecryptText, DecryptKey)+"\n", decryptFileName);
+        writeToFile("DES3 Plaintext: " + des3.decryptDES(DecryptText, DecryptKey)+"\n", decryptFileName);
     }
 
     /**

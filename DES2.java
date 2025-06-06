@@ -513,4 +513,42 @@ public class DES2 {
         
         return count; // Return the number of differing bits
     }
+
+    /**
+     * Decrypts the ciphertext using DES2 algorithm (inverse expansion instead of S-boxes).
+     * 
+     * @param decryptText The ciphertext to be decrypted.
+     * @param decryptKey The key to be used for decryption.
+     * @return The decrypted plaintext.
+     */
+    public String decryptDES(String decryptText, String decryptKey) {
+        String decrypted = "";
+
+        String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
+        String pc1Key = pc1Key(decryptKey, PC1);
+
+        // Split the permutated ciphertext into left and right halves
+        String left = decrpt.substring(0, 32);
+        String right = decrpt.substring(32, 64);
+
+        // 16 rounds of DES decryption (reverse order)
+        for (int i = 15; i >= 0; i--) {
+            String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
+            String xorResult = functionXOR(expandedRight, pc2KeyRound(pc1Key, PC2, i));// XOR of expanded right and PC2 key
+            // DES2: Skip S-boxes, use inverse expansion E^-1 for 48->32 bit contraction
+            String contractedInput = inverseExpansion(xorResult);
+            String pBoxOutput = endPermutaion(contractedInput, PERMUTATION);
+            String newRight = functionXOR(left, pBoxOutput);
+
+            // Update left and right halves for the next round
+            left = right; // left becomes the old right
+            right = newRight; // right becomes the new right
+        }
+
+        // Combine left and right halves
+        String combinedHalves = right + left;
+        // Final permutation (IP-1 Inverse)
+        decrypted = permutation(combinedHalves, FINAL_PERMUTATION);
+        return decrypted;
+    }
 }

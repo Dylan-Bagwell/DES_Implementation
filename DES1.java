@@ -470,4 +470,40 @@ public class DES1 {
         
         return count; // Return the number of differing bits
     }
+
+    /**
+     * Decrypts the ciphertext using DES1 algorithm (no XOR with round key).
+     * 
+     * @param decryptText The ciphertext to be decrypted.
+     * @param decryptKey The key to be used for decryption.
+     * @return The decrypted plaintext.
+     */
+    public String decryptDES(String decryptText, String decryptKey) {
+        String decrypted = "";
+
+        String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
+
+        // Split the permutated ciphertext into left and right halves
+        String left = decrpt.substring(0, 32);
+        String right = decrpt.substring(32, 64);
+
+        // 16 rounds of DES decryption (reverse order)
+        for (int i = 15; i >= 0; i--) {
+            String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
+            // DES1: Skip XOR with round key, but keep S-boxes and P-box
+            String sBoxOutput = sBoxSubstitution(expandedRight);
+            String pBoxOutput = endPermutaion(sBoxOutput, PERMUTATION);
+            String newRight = functionXOR(left, pBoxOutput);
+
+            // Update left and right halves for the next round
+            left = right; // left becomes the old right
+            right = newRight; // right becomes the new right
+        }
+
+        // Combine left and right halves
+        String combinedHalves = right + left;
+        // Final permutation (IP-1 Inverse)
+        decrypted = permutation(combinedHalves, FINAL_PERMUTATION);
+        return decrypted;
+    }
 }
