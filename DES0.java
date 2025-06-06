@@ -439,14 +439,12 @@ public class DES0 {
 
     // Performs the perumation (P) on the S-box output
     private String endPermutaion(String sBox, int[] permutationP) {
-
+        StringBuilder permutedOutput = new StringBuilder();
         for (int i : permutationP) {
-            sBox += sBox.charAt(i - 1);
+            permutedOutput.append(sBox.charAt(i - 1));
         }
-        // System.out.println("S-box output after P permutation: " + sBox + " Length: "
-        // + sBox.length());//should be 32 bits long
-        return sBox;
-    }
+        return permutedOutput.toString();
+}
 
     /**
      * Compares two strings bit by bit and counts the number of differing bits.

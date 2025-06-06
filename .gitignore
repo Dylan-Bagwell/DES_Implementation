@@ -1,2 +1,5 @@
 # Java Files
 *.class
+/out
+.vscode
+.idea

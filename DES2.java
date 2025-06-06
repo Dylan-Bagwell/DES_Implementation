@@ -492,8 +492,8 @@ public class DES2 {
         for (int i : permutationP) {
             permutedOutput.append(sBox.charAt(i - 1));
         }
-        // System.out.println("S-box output after P permutation: " + permutedOutput + " Length: "
-        // + permutedOutput.length());//should be 32 bits long
+//        System.out.println("S-box output after P permutation: " + permutedOutput + " Length: "
+//        + permutedOutput.length());//should be 32 bits long
         return permutedOutput.toString();
     }
 
@@ -522,20 +522,21 @@ public class DES2 {
      * @return The decrypted plaintext.
      */
     public String decryptDES(String decryptText, String decryptKey) {
-        String decrypted = "";
+        String decrypted;
 
         String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
         String pc1Key = pc1Key(decryptKey, PC1);
 
-        // Split the permutated ciphertext into left and right halves
+        // Split the perumutated ciphertext into left and right halves
         String left = decrpt.substring(0, 32);
         String right = decrpt.substring(32, 64);
 
-        // 16 rounds of DES decryption (reverse order)
+        // 16 rounds of DES decryption in reverse
         for (int i = 15; i >= 0; i--) {
             String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
             String xorResult = functionXOR(expandedRight, pc2KeyRound(pc1Key, PC2, i));// XOR of expanded right and PC2 key
-            // DES2: Skip S-boxes, use inverse expansion E^-1 for 48->32 bit contraction
+
+            // DES2 Specific: skip S-boxes, use inverse expansion E^-1 for bit contraction
             String contractedInput = inverseExpansion(xorResult);
             String pBoxOutput = endPermutaion(contractedInput, PERMUTATION);
             String newRight = functionXOR(left, pBoxOutput);

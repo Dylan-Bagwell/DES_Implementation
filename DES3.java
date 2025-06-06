@@ -500,20 +500,21 @@ public class DES3 {
      * @return The decrypted plaintext.
      */
     public String decryptDES(String decryptText, String decryptKey) {
-        String decrypted = "";
+        String decrypted;
 
         String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
         String pc1Key = pc1Key(decryptKey, PC1);
 
-        // Split the permutated ciphertext into left and right halves
+        // Split the perumutated ciphertext into left and right halves
         String left = decrpt.substring(0, 32);
         String right = decrpt.substring(32, 64);
 
-        // 16 rounds of DES decryption (reverse order)
+        // 16 rounds of DES decryption in reverse
         for (int i = 15; i >= 0; i--) {
             String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
             String xorResult = functionXOR(expandedRight, pc2KeyRound(pc1Key, PC2, i));// XOR of expanded right and PC2 key
-            // DES3: Keep S-boxes but skip P-box permutation
+
+            // DES3 Specific: Keep S-boxes but skip P-box permutation
             String sBoxOutput = sBoxSubstitution(xorResult);
             String newRight = functionXOR(left, sBoxOutput);
 

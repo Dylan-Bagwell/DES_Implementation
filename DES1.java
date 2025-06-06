@@ -445,13 +445,13 @@ public class DES1 {
 
     // Performs the perumation (P) on the S-box output
     private String endPermutaion(String sBox, int[] permutationP) {
-
+        StringBuilder permutedOutput = new StringBuilder();
         for (int i : permutationP) {
-            sBox += sBox.charAt(i - 1);
+            permutedOutput.append(sBox.charAt(i - 1));
         }
-        // System.out.println("S-box output after P permutation: " + sBox + " Length: "
-        // + sBox.length());//should be 32 bits long
-        return sBox;
+        // System.out.println("S-box output after P permutation: " + permutedOutput + " Length: "
+        // + permutedOutput.length());//should be 32 bits long
+        return permutedOutput.toString();
     }
 
     private int compareRound(String one, String two, int round) {
@@ -483,11 +483,10 @@ public class DES1 {
 
         String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
 
-        // Split the permutated ciphertext into left and right halves
+        // Split the perumutated ciphertext into left and right halves
         String left = decrpt.substring(0, 32);
         String right = decrpt.substring(32, 64);
 
-        // 16 rounds of DES decryption (reverse order)
         for (int i = 15; i >= 0; i--) {
             String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
             // DES1: Skip XOR with round key, but keep S-boxes and P-box
