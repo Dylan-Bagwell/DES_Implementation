@@ -23,7 +23,7 @@ public class DES0 implements DESInterface {
         this.key = key;
         this.inversePlaintext = inversePlaintext;
         this.inverseKey = inverseKey;
-        this.compareRound1 = new int[17]; // Initialize comparison array for 16 rounds
+        this.compareRound1 = new int[17]; // Initialise comparison array for 16 rounds
         this.compareRound2 = new int[17];
     }
 
@@ -206,7 +206,7 @@ public class DES0 implements DESInterface {
         String pc1Key = pc1Key(key, PC1);
         String pc1KeyInv = pc1Key(inverseKey, PC1);
         
-        // Initialize key schedule state (C and D registers)
+        // Initialise key schedule state (C and D registers)
         String c = pc1Key.substring(0, 28);
         String d = pc1Key.substring(28, 56);
         String cInv = pc1KeyInv.substring(0, 28);
@@ -501,7 +501,7 @@ public class DES0 implements DESInterface {
         String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
         String pc1Key = pc1Key(decryptKey, PC1);
 
-        // Initialize key schedule and generate all round keys first
+        // Initialise key schedule and generate all round keys first
         String c = pc1Key.substring(0, 28);
         String d = pc1Key.substring(28, 56);
         String[] roundKeys = new String[16];

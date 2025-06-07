@@ -25,7 +25,7 @@ public class DES1 implements DESInterface {
         this.key = key;
         this.inversePlaintext = inversePlaintext;
         this.inverseKey = inverseKey;
-        this.compareRound1 = new int[17]; // Initialize comparison array for 16 rounds
+        this.compareRound1 = new int[17]; // Initialise comparison array for 16 rounds
         this.compareRound2 = new int[17];
     }
 
