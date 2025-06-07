@@ -148,7 +148,7 @@ public class Main {
         // P under K and K' comparison
         writeToFile("\nP under K and K'\n", encryptionfile);
         writeToFile("Ciphertext C: " + ciphertexts[0] + "\n", encryptionfile);  // DES0 result
-        writeToFile("Ciphertext C':" + desVariants[0].getCipherPInvK() + "\n", encryptionfile);
+        writeToFile("Ciphertext C': " + desVariants[0].getCipherPInvK() + "\n", encryptionfile);
         writeToFile("Round    " + desVariants[0].getName() +"    " +desVariants[1].getName()+"    " +desVariants[2].getName()+"    " +desVariants[3].getName()+"\n",encryptionfile);
         
         for (int j = 0; j < 17; j++) {
