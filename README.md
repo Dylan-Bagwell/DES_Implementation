@@ -1,15 +1,39 @@
-# 3260A2
-Code for the DES for Assignment 2
+# DES Implementation - 3260A2
 
-Authors: Dylan Bagwell C3432837, Daniel Ferguson C3373690
+## Description
 
-Dated Created: 02/05/2025
-Description: Program takes an input file and Runs different versions of DES to see
-what the output is and explore the Avalanche effect of the orginal DES. Each version of DES is different and produces a different outcome.
+This program implements different versions of the DES algorithm to demonstrate the avalanche effect. 
 
-Runing the Program:
-Coded in java must have java 17.0.12 or newer to compile and run.
+The program reads input data from a file and processes it through four DES distinct implementations.
 
-Step 1: Compile the program to run using javac * .java this will complie all files and ensure program runs as intended.
+**Date Created:** May 2, 2025
+## Authors
+- **Dylan Bagwell** (C3432837)
+- **Daniel Ferguson** (C3373690)
 
-Step 2: In the command line in putting java Main.java (file.txt). The name of your file at the end of the command will run the program and output based on the DES used with results pritned to the command line. If using the file provided with the program please put java Main.java EncryptInput.txt DecryptionInput.txt
+## Requirements
+
+- **Java Version:** 17.0.12 or newer
+
+### Step 1: Compile the Program
+
+Navigate to the program directory and compile all Java files:
+
+```bash
+javac *.java
+```
+
+### Step 2: Run the Program
+
+Execute the program with an input file:
+
+```bash
+java Main <input_file>
+```
+
+**Example:**
+```bash
+java Main TestDataInput.txt
+```
+The program can also be run without an input file, in which case it will use the default parameters defined in the `Main` class.
+
