@@ -154,7 +154,7 @@ public class DES2 implements DESInterface {
     // s7
     private static final int[][] S7_BOX = {
             { 4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1 },
-            { 1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2 },
+            { 13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6 },
             { 1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2 },
             { 6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12 }
     };
@@ -182,7 +182,7 @@ public class DES2 implements DESInterface {
     private static final int[] PC1 = {
             57, 49, 41, 33, 25, 17, 9,
             1, 58, 50, 42, 34, 26, 18,
-            10, 2, 59, 51, 53, 35, 27,
+            10, 2, 59, 51, 43, 35, 27,
             19, 11, 3, 60, 52, 44, 36,
             63, 55, 47, 39, 31, 23, 15,
             7, 62, 54, 46, 38, 30, 22,
@@ -191,7 +191,7 @@ public class DES2 implements DESInterface {
     };
 
     // The number of bits to shift left for each round
-    private static final int[] LEFT_SHIFTS = { 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2 };
+    private static final int[] LEFT_SHIFTS = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
 
     // Permutation Choice 2 (PC-2) used to permute the key for each round
     private static final int[] PC2 = {

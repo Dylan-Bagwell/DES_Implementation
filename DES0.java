@@ -133,7 +133,7 @@ public class DES0 implements DESInterface {
     // s7
     private static final int[][] S7_BOX = {
             { 4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1 },
-            { 1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2 },
+            { 13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6 },
             { 1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2 },
             { 6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12 }
     };
@@ -161,7 +161,7 @@ public class DES0 implements DESInterface {
     private static final int[] PC1 = {
             57, 49, 41, 33, 25, 17, 9,
             1, 58, 50, 42, 34, 26, 18,
-            10, 2, 59, 51, 53, 35, 27,
+            10, 2, 59, 51, 43, 35, 27,
             19, 11, 3, 60, 52, 44, 36,
             63, 55, 47, 39, 31, 23, 15,
             7, 62, 54, 46, 38, 30, 22,
@@ -170,7 +170,7 @@ public class DES0 implements DESInterface {
     };
 
     // The number of bits to shift left for each round
-    private static final int[] LEFT_SHIFTS = { 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2 };
+    private static final int[] LEFT_SHIFTS = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
 
     // Permutation Choice 2 (PC-2) used to permute the key for each round
     private static final int[] PC2 = {
@@ -205,6 +205,13 @@ public class DES0 implements DESInterface {
 
         String pc1Key = pc1Key(key, PC1);
         String pc1KeyInv = pc1Key(inverseKey, PC1);
+        
+        // Initialize key schedule state (C and D registers)
+        String c = pc1Key.substring(0, 28);
+        String d = pc1Key.substring(28, 56);
+        String cInv = pc1KeyInv.substring(0, 28);
+        String dInv = pc1KeyInv.substring(28, 56);
+        
         // Split the perumutated plaintext into left and right halves
         String left = permPlain.substring(0, 32);
         String right = permPlain.substring(32, 64);
@@ -219,8 +226,13 @@ public class DES0 implements DESInterface {
         // 16 rounds of DES
         for (int i = 0; i < 16; i++) {
 
+            // Generate round key with correct accumulating shifts
+            c = leftShfit(i, c);
+            d = leftShfit(i, d);
+            String roundKey = permutation(c + d, PC2);
+            
             String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2,i));// XOR of expanded right and PC2 key
+            String xorResult = functionXOR(expandedRight, roundKey);// XOR of expanded right and round key
             String sBoxOutput = sBoxSubstitution(xorResult);
             String pBoxOutput = endPermutaion(sBoxOutput, PERMUTATION);
             String newRight = functionXOR(left, pBoxOutput);
@@ -234,7 +246,7 @@ public class DES0 implements DESInterface {
 
             // Second round for comparison
             String expandedRightInv = expandRight(rightInv, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResultInv = functionXOR(expandedRightInv, pc2Key(pc1Key, PC2,i));// XOR of expanded right and PC2
+            String xorResultInv = functionXOR(expandedRightInv, roundKey);// XOR of expanded right and round key
             String sBoxOutputInv = sBoxSubstitution(xorResultInv);
             String pBoxOutputInv = endPermutaion(sBoxOutputInv, PERMUTATION);
             String newRightInv = functionXOR(leftInv, pBoxOutputInv);
@@ -248,9 +260,13 @@ public class DES0 implements DESInterface {
             rightInv = newRightInv; // right becomes the new right
            
 
-            // P under K'
+            // P under K' - generate round key for inverse key
+            cInv = leftShfit(i, cInv);
+            dInv = leftShfit(i, dInv);
+            String roundKeyInv = permutation(cInv + dInv, PC2);
+            
             String expandedRightIvKy = expandRight(rightPlainInv, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResultIvKy = functionXOR(expandedRightIvKy, pc2Key(pc1KeyInv, PC2,i));// XOR of expanded right and PC2
+            String xorResultIvKy = functionXOR(expandedRightIvKy, roundKeyInv);// XOR of expanded right and round key
             String sBoxOutputIvKy = sBoxSubstitution(xorResultIvKy);
             String pBoxOutputIvKy = endPermutaion(sBoxOutputIvKy, PERMUTATION);
             String newRightIvKy = functionXOR(leftPlainInv, pBoxOutputIvKy);
@@ -485,14 +501,27 @@ public class DES0 implements DESInterface {
         String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
         String pc1Key = pc1Key(decryptKey, PC1);
 
-        // Split the perumutated plaintext into left and right halves
+        // Initialize key schedule and generate all round keys first
+        String c = pc1Key.substring(0, 28);
+        String d = pc1Key.substring(28, 56);
+        String[] roundKeys = new String[16];
+        
+        // Generate all round keys in forward order
+        for (int i = 0; i < 16; i++) {
+            c = leftShfit(i, c);
+            d = leftShfit(i, d);
+            roundKeys[i] = permutation(c + d, PC2);
+        }
+
+        // Split the perumutated ciphertext into left and right halves
         String left = decrpt.substring(0, 32);
         String right = decrpt.substring(32, 64);
 
+        // Use round keys in reverse order for decryption
         for (int i = 15; i >= 0; i--) {
 
             String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
-            String xorResult = functionXOR(expandedRight, pc2Key(pc1Key, PC2,i));// XOR of expanded right and PC2 key
+            String xorResult = functionXOR(expandedRight, roundKeys[i]);// XOR with round key in reverse order
             String sBoxOutput = sBoxSubstitution(xorResult);
             String pBoxOutput = endPermutaion(sBoxOutput, PERMUTATION);
             String newRight = functionXOR(left, pBoxOutput);
