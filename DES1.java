@@ -2,11 +2,11 @@
  * Authors: Dylan Bagwell C3432837, Daniel Ferguson C3373690
  * Course: 3260 Data Security
  * Date Created: 30/0502025
- * Last Modified: 30/05/2025 
+ * Last Modified: 06/06/2025
  * 
- * Description: The Second implementation full implementation of the DES algortihm.
+ * Description: The Second implementation of the DES algortihm.
  */
-public class DES1 {
+public class DES1 implements DESInterface {
 
     private String name = "DES1"; // Name of the DES implementation
     private String plaintext = "";
@@ -445,13 +445,13 @@ public class DES1 {
 
     // Performs the perumation (P) on the S-box output
     private String endPermutaion(String sBox, int[] permutationP) {
-
+        StringBuilder permutedOutput = new StringBuilder();
         for (int i : permutationP) {
-            sBox += sBox.charAt(i - 1);
+            permutedOutput.append(sBox.charAt(i - 1));
         }
-        // System.out.println("S-box output after P permutation: " + sBox + " Length: "
-        // + sBox.length());//should be 32 bits long
-        return sBox;
+        // System.out.println("S-box output after P permutation: " + permutedOutput + " Length: "
+        // + permutedOutput.length());//should be 32 bits long
+        return permutedOutput.toString();
     }
 
     private int compareRound(String one, String two, int round) {
@@ -469,5 +469,40 @@ public class DES1 {
         }
         
         return count; // Return the number of differing bits
+    }
+
+    /**
+     * Decrypts the ciphertext using DES1 algorithm (no XOR with round key).
+     * 
+     * @param decryptText The ciphertext to be decrypted.
+     * @param decryptKey The key to be used for decryption.
+     * @return The decrypted plaintext.
+     */
+    public String decryptDES(String decryptText, String decryptKey) {
+        String decrypted = "";
+
+        String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
+
+        // Split the perumutated ciphertext into left and right halves
+        String left = decrpt.substring(0, 32);
+        String right = decrpt.substring(32, 64);
+
+        for (int i = 15; i >= 0; i--) {
+            String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
+            // DES1: Skip XOR with round key, but keep S-boxes and P-box
+            String sBoxOutput = sBoxSubstitution(expandedRight);
+            String pBoxOutput = endPermutaion(sBoxOutput, PERMUTATION);
+            String newRight = functionXOR(left, pBoxOutput);
+
+            // Update left and right halves for the next round
+            left = right; // left becomes the old right
+            right = newRight; // right becomes the new right
+        }
+
+        // Combine left and right halves
+        String combinedHalves = right + left;
+        // Final permutation (IP-1 Inverse)
+        decrypted = permutation(combinedHalves, FINAL_PERMUTATION);
+        return decrypted;
     }
 }

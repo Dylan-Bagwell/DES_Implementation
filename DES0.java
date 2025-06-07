@@ -2,11 +2,11 @@
  * Authors: Dylan Bagwell C3432837, Daniel Ferguson C3373690
  * Course: 3260 Data Security
  * Date Created: 02/0502025
- * Last Modified: 30/05/2025 
+ * Last Modified: 06/06/2025
  * 
- * Description: The first implementation full implementation of the DES algortihm.
+ * Description: The first implementation of the DES algortihm.
  */
-public class DES0 {
+public class DES0 implements DESInterface {
     private String name = "DES0"; // Name of the DES implementation
     private String plaintext;
     private String key;
@@ -439,14 +439,12 @@ public class DES0 {
 
     // Performs the perumation (P) on the S-box output
     private String endPermutaion(String sBox, int[] permutationP) {
-
+        StringBuilder permutedOutput = new StringBuilder();
         for (int i : permutationP) {
-            sBox += sBox.charAt(i - 1);
+            permutedOutput.append(sBox.charAt(i - 1));
         }
-        // System.out.println("S-box output after P permutation: " + sBox + " Length: "
-        // + sBox.length());//should be 32 bits long
-        return sBox;
-    }
+        return permutedOutput.toString();
+}
 
     /**
      * Compares two strings bit by bit and counts the number of differing bits.

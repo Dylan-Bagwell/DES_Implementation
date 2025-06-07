@@ -4,9 +4,10 @@
  * Date Created: 30/0502025
  * Last Modified: 30/05/2025 
  * 
- * Description: The Second implementation full implementation of the DES algortihm.
+ * Description: The Third implementation of the DES algorithm.
+ * This implementation uses inverse expansion instead of S-boxes
  */
-public class DES2 {
+public class DES2 implements DESInterface {
 
     private String name = "DES2"; // Name of the DES implementation
     private String plaintext = "";
@@ -52,17 +53,16 @@ public class DES2 {
         return compareRound2[round];
     }
 
-    // Proper Inverse Expansion Permutation (E^-1) - contracts 48 bits back to 32 bits
-    // Maps each 48-bit position back to its corresponding 32-bit position
+    // E^-1 Table, specific to the DES2 class
     private static final int[] INVERSE_EXPANSION_TABLE = {
         2, 3, 4, 5, 6, 9, 10, 11, 12, 15, 16, 17, 18, 21, 22, 23, 
         24, 27, 28, 29, 30, 33, 34, 35, 36, 39, 40, 41, 42, 45, 46, 1
     };
     
-    // Apply inverse expansion using the proper mapping
+    // inverse expansion using the proper mapping, specific to the DES2 class
     private static String inverseExpansion(String input48) {
         if (input48.length() != 48) {
-            throw new IllegalArgumentException("Input must be 48 bits long");
+            throw new IllegalArgumentException("must be 48 bits long");
         }
         StringBuilder output32 = new StringBuilder();
         for (int pos : INVERSE_EXPANSION_TABLE) {
@@ -248,7 +248,7 @@ public class DES2 {
             String xorResult = functionXOR(expandedRight, pc2KeyRound(pc1Key, PC2, i));// XOR of expanded right and PC2 key
             // DES2: Skip S-boxes, use inverse expansion E^-1 for 48->32 bit contraction instead
             String contractedInput = inverseExpansion(xorResult);
-            String pBoxOutput = endPermutaion(contractedInput, PERMUTATION);
+            String pBoxOutput = endPermutation(contractedInput, PERMUTATION);
             String newRight = functionXOR(left, pBoxOutput);
            
 
@@ -263,7 +263,7 @@ public class DES2 {
             String xorResultInv = functionXOR(expandedRightInv, pc2KeyRound(pc1Key, PC2, i));// XOR of expanded right and PC2
             // DES2: Skip S-boxes, use inverse expansion E^-1 for 48->32 bit contraction
             String contractedInputInv = inverseExpansion(xorResultInv);
-            String pBoxOutputInv = endPermutaion(contractedInputInv, PERMUTATION);
+            String pBoxOutputInv = endPermutation(contractedInputInv, PERMUTATION);
             String newRightInv = functionXOR(leftInv, pBoxOutputInv);
 
             
@@ -280,7 +280,7 @@ public class DES2 {
             String xorResultIvKy = functionXOR(expandedRightIvKy, pc2KeyRound(pc1KeyInv, PC2, i));// XOR of expanded right and PC2
             // DES2: Skip S-boxes, use inverse expansion E^-1 for 48->32 bit contraction
             String contractedInputIvKy = inverseExpansion(xorResultIvKy);
-            String pBoxOutputIvKy = endPermutaion(contractedInputIvKy, PERMUTATION);
+            String pBoxOutputIvKy = endPermutation(contractedInputIvKy, PERMUTATION);
             String newRightIvKy = functionXOR(leftPlainInv, pBoxOutputIvKy);
 
             
@@ -308,7 +308,7 @@ public class DES2 {
         
     }
 
-    // is a permutation function that rearranges the input string based on the
+    // permutation function that rearranges the input string based on the
     // provided permutation table (P)
     private static String permutation(String input, int[] permutation) {
         StringBuilder output = new StringBuilder();
@@ -371,31 +371,6 @@ public class DES2 {
         return pc2Key.toString();
     }
 
-    // returns a key thats been shifted left and permuted using the PC2 table
-    private static String pc2Key(String pc1Key, int[] pc2) {
-        StringBuilder pc2Key = new StringBuilder();
-
-        // Split the key into two halves then perform left shift
-        String cKey = pc1Key.substring(0, 28);// 28 bits for C testing with 0 round for now
-        // System.out.println("C Key: " + cKey.length());
-        String dKey = pc1Key.substring(28, 56);// 28 bits for D
-        // System.out.println("D Key: " + dKey.length());
-        cKey = leftShfit(0, cKey);
-        dKey = leftShfit(0, dKey);
-
-        // Combine the halves
-        String combined = cKey + dKey;
-
-        // Permute combined key using pc2 array
-        for (int i : pc2) {
-            pc2Key.append(combined.charAt(i - 1));
-        }
-
-        // System.out.println("Key after PC2 permutation: " + pc2Key);
-        // System.out.println("Key length after PC2 permutation: " + pc2Key.length());
-        String key = pc2Key.toString();
-        return key;
-    }
 
     // takes right half and performs (E) expansion permutation
     private static String expandRight(String right, int[] expansionPermutation) {
@@ -487,13 +462,13 @@ public class DES2 {
     }
 
     // Performs the perumation (P) on the S-box output
-    private String endPermutaion(String sBox, int[] permutationP) {
+    private String endPermutation(String sBox, int[] permutationP) {
         StringBuilder permutedOutput = new StringBuilder();
         for (int i : permutationP) {
             permutedOutput.append(sBox.charAt(i - 1));
         }
-        // System.out.println("S-box output after P permutation: " + permutedOutput + " Length: "
-        // + permutedOutput.length());//should be 32 bits long
+//        System.out.println("S-box output after P permutation: " + permutedOutput + " Length: "
+//        + permutedOutput.length());//should be 32 bits long
         return permutedOutput.toString();
     }
 
@@ -512,5 +487,44 @@ public class DES2 {
         }
         
         return count; // Return the number of differing bits
+    }
+
+    /**
+     * Decrypts the ciphertext using DES2 algorithm (inverse expansion instead of S-boxes).
+     * 
+     * @param decryptText The ciphertext to be decrypted.
+     * @param decryptKey The key to be used for decryption.
+     * @return The decrypted plaintext.
+     */
+    public String decryptDES(String decryptText, String decryptKey) {
+        String decrypted;
+
+        String decrpt = permutation(decryptText, INITIAL_PERMUTATION);
+        String pc1Key = pc1Key(decryptKey, PC1);
+
+        // Split the perumutated ciphertext into left and right halves
+        String left = decrpt.substring(0, 32);
+        String right = decrpt.substring(32, 64);
+
+        // 16 rounds of DES decryption in reverse
+        for (int i = 15; i >= 0; i--) {
+            String expandedRight = expandRight(right, EXPANSION_PERMUTATION); // expansion of the right half
+            String xorResult = functionXOR(expandedRight, pc2KeyRound(pc1Key, PC2, i));// XOR of expanded right and PC2 key
+
+            // DES2 Specific: skip S-boxes, use inverse expansion E^-1 for bit contraction
+            String contractedInput = inverseExpansion(xorResult);
+            String pBoxOutput = endPermutation(contractedInput, PERMUTATION);
+            String newRight = functionXOR(left, pBoxOutput);
+
+            // Update left and right halves for the next round
+            left = right; // left becomes the old right
+            right = newRight; // right becomes the new right
+        }
+
+        // Combine left and right halves
+        String combinedHalves = right + left;
+        // Final permutation (IP-1 Inverse)
+        decrypted = permutation(combinedHalves, FINAL_PERMUTATION);
+        return decrypted;
     }
 }
