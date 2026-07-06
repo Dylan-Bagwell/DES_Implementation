@@ -1,5 +1,5 @@
 /*
- * Authors: Dylan Bagwell C3432837, Daniel Ferguson C3373690
+ * Authors: Dylan Bagwell, Daniel Ferguson
  * Course: 3260 Data Security
  * Date Created: 02/0502025
  * Last Modified: 06/06/2025
