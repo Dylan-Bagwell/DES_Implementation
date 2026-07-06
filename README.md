@@ -1,4 +1,4 @@
-# DES Implementation - 3260A2
+# DES Implementation 
 
 ## Description
 
@@ -8,8 +8,8 @@ The program reads input data from a file and processes it through four DES disti
 
 **Date Created:** May 2, 2025
 ## Authors
-- **Dylan Bagwell** (C3432837)
-- **Daniel Ferguson** (C3373690)
+- **Dylan Bagwell** 
+- **Daniel Ferguson** 
 
 ## Requirements
 
